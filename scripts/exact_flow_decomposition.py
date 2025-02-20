@@ -11,9 +11,17 @@ from simulate_data import create_genome, create_haplotypes, make_graph, contract
 from graph_tool.topology import is_DAG
 import time
 import json
+import argparse
+
+usage = """
+    This script is used to decompose a flow graph into a set of paths.
+"""
 
 def main():
-    for i in range(2, 8):
+    parser = argparse.ArgumentParser(description=usage)
+    parser.add_argument('-i', '--num_haps', dest='num_haps', type=int, required=True, help="Number of haplotypes, creates test instances from 2 to i")
+    args = parser.parse_args()
+    for i in range(2, args.num_haps):
         test_with_simulated_data(100, i)
     # test_with_read_from_file('Data/example_graphs/graph_1_three_paths.gfa', 'Data/example_graphs/abundances_1.txt')
     # for i in range(10, 2000, 50):
