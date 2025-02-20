@@ -1,0 +1,13 @@
+name: vg-flow-env
+channels:
+  - conda-forge
+  - bioconda
+  - gurobi
+  - defaults
+dependencies:
+- python=3
+- graph-tool
+- minimap2
+- gurobi=11.0
+- biopython
+- numpy
