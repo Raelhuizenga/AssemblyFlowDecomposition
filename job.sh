@@ -18,7 +18,7 @@ export WORKDIR="/tudelft.net/staff-umbrella/FlowDecomposition/flow_assembly/Asse
 export SCRIPT_DIR="$WORKDIR/scripts"
 
 # Set Gurobi license file path
-export GRB_LICENSE_FILE="/tudelft.net/staff-umbrella/FlowDecomposition"
+export GRB_LICENSE_FILE="/tudelft.net/staff-umbrella/FlowDecomposition/gurobi.lic"
 
 # Run the first script inside the container
 srun apptainer exec \
