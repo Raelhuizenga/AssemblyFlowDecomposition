@@ -1,7 +1,7 @@
 #!/bin/sh
 #SBATCH --partition=general   # Request partition
 #SBATCH --qos=short           # Request Quality of Service
-#SBATCH --time=0:05:00        # Request run time (wall-clock)
+#SBATCH --time=2:00:00        # Request run time (wall-clock)
 #SBATCH --ntasks=1            # Request number of parallel tasks per job
 #SBATCH --cpus-per-task=2     # Request number of CPUs (threads) per task
 #SBATCH --mem=1GB             # Request memory (MB) per node
@@ -25,4 +25,7 @@ srun apptainer exec \
   -B "$WORKDIR:$WORKDIR" \
   -B "$HOME:$HOME" \
   "$APPTAINER_ROOT/$APPTAINER_NAME" \
-  python "$SCRIPT_DIR/exact_flow_decomposition.py"
+  python "$SCRIPT_DIR/exact_flow_decomposition.py" -i 3
+
+if [ $? -eq 0 ]; then
+  echo "Script finished successfully."
