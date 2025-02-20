@@ -29,3 +29,4 @@ srun apptainer exec \
 
 if [ $? -eq 0 ]; then
   echo "Script finished successfully."
+fi
