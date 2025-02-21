@@ -14,7 +14,7 @@ export APPTAINER_ROOT="."
 export APPTAINER_NAME="vg-flow-image.sif"
 
 # Get current working directory
-export WORKDIR="tudelft.net/staff-umbrella/FlowDecomposition"
+export WORKDIR="/tudelft.net/staff-umbrella/FlowDecomposition"
 export SCRIPT_DIR="$WORKDIR/flow_assembly/AssemblyFlowDecomposition/scripts"
 
 # Set Gurobi license file path
