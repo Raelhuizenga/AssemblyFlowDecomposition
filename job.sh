@@ -14,11 +14,11 @@ export APPTAINER_ROOT="."
 export APPTAINER_NAME="vg-flow-image.sif"
 
 # Get current working directory
-export WORKDIR="mnt/staff-umbrella/FlowDecomposition/flow_assembly/AssemblyFlowDecomposition"
-export SCRIPT_DIR="$WORKDIR/scripts"
+export WORKDIR="tudelft.net/staff-umbrella/FlowDecomposition"
+export SCRIPT_DIR="$WORKDIR/flow_assembly/AssemblyFlowDecomposition/scripts"
 
 # Set Gurobi license file path
-export GRB_LICENSE_FILE="mnt/staff-umbrella/FlowDecomposition/gurobi.lic"
+export GRB_LICENSE_FILE="$WORKDIR/gurobi.lic"
 
 # Run the first script inside the container
 srun apptainer exec \
