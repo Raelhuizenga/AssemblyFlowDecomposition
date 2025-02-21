@@ -21,8 +21,7 @@ def main():
     parser = argparse.ArgumentParser(description=usage)
     parser.add_argument('-i', '--num_haps', dest='num_haps', type=int, required=True, help="Number of haplotypes, creates test instances from 2 to i")
     args = parser.parse_args()
-    for i in range(2, args.num_haps):
-        test_with_simulated_data(100, i)
+    test_with_simulated_data(genome_size=10000, num_haps = 3, mutataion_rate=0.01)
     # test_with_read_from_file('Data/example_graphs/graph_1_three_paths.gfa', 'Data/example_graphs/abundances_1.txt')
     # for i in range(10, 2000, 50):
     #     test_with_simulated_data(i, 3)
