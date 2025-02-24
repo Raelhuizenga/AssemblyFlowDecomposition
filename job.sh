@@ -25,7 +25,7 @@ srun apptainer exec \
   -B "$WORKDIR:$WORKDIR" \
   -B "$HOME:$HOME" \
   "$APPTAINER_ROOT/$APPTAINER_NAME" \
-  python "$SCRIPT_DIR/exact_flow_decomposition.py" -i 10
+  python "$SCRIPT_DIR/exact_flow_decomposition.py" -g 10000 -m 0.01 -i 5 
 
 if [ $? -eq 0 ]; then
   echo "Script finished successfully."
