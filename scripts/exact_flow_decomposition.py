@@ -20,7 +20,7 @@ usage = """
 def main():
     parser = argparse.ArgumentParser(description=usage)
     parser.add_argument('-g', '--genome_size', dest='genome_size', type=int, required=True, help="Size of the genome")
-    parser.add_argument('-m', '--mutation_rate', dest='mutation_rate', type=int, required=True, help="Mutation rate")
+    parser.add_argument('-m', '--mutation_rate', dest='mutation_rate', type=float, required=True, help="Mutation rate")
     parser.add_argument('-i', '--num_haps', dest='num_haps', type=int, required=True, help="Number of haplotypes, creates test instances from 2 to i")
     args = parser.parse_args()
     test_with_simulated_data(genome_size=args.genome_size, num_haps = args.num_haps, mutataion_rate=args.mutation_rate)
