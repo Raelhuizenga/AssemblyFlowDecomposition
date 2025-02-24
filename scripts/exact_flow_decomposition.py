@@ -7,7 +7,7 @@ import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
 from graph_tool.draw import graph_draw, sfdp_layout
-from simulate_data import create_genome, create_haplotypes, make_graph, contract_vertices, get_contig_paths_from_graph
+from simulate_data import create_genome, create_haplotypes, make_graph, contract_vertices, get_contig_paths_from_graph, create_abundance_file, create_graph_file
 from graph_tool.topology import is_DAG
 import time
 import json
@@ -94,6 +94,8 @@ def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2)
     weights = exponential_weights(num_haps)
     graph, contigs = make_graph(haps, weights)
     graph = contract_vertices(graph)
+    create_graph_file(graph, f"graph_{genome_size}_{num_haps}.gfa")
+    create_abundance_file(graph, f"abundances_{genome_size}_{num_haps}.txt")
     graph = add_source_and_sink(graph)
     x, obj, graph = induce_flow_on_graph(graph, 1)
     print("Objective value: ", obj)
