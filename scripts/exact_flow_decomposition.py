@@ -117,6 +117,10 @@ def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2)
     with open(f"output/solutions/numhaplotypes/solution_paths_{genome_size}_{num_haps}.json", "w") as f:
         json.dump({"weights": w_sol, "paths": sol_paths, "time": end_time-start_time}, f)
 
+    with open(f"output/solutions/ILP/solution_paths_{genome_size}_{num_haps}.final.fasta", "w") as f:
+        for i in range(len(w_sol)):
+            f.write(f'>path{i} {w_sol[i]}x freq={round(w_sol[i] / sum(w_sol), 3)}\n{sol_paths[i]}\n')
+
     assert(sorted(sol_paths) == sorted(haps))
     
 def exponential_weights(size_array) -> list:

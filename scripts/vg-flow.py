@@ -192,6 +192,8 @@ def main():
             abundance_list, vg_to_contigs, adj_out, skip_nodes,
             args.reduce_obj, minimization_min_cov, args.min_cov,
             args.min_ab, args.threads)
+    print("##################### HERE #####################")
+    print(x)
     # write contigs and their subpaths to files for error investigation
     contig_dict = {}
     for i, c in enumerate(adj_out):
@@ -1785,6 +1787,7 @@ def optimize_abundances(a, nvert, paths, skip_nodes, reduce_obj, max_strains,
             if obj_func < 4 or obj_func == 6:
                 m.addConstr(y[v] == 0, "y_{}_0".format(v))
             continue
+        print('hellooo')
         if reduce_obj > 0:
             # check if v adds a new combination of paths
             path_combi = tuple(P[v])

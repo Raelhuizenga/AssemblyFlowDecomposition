@@ -15,6 +15,18 @@ def main():
     paths = get_contig_paths_from_graph(g, contigs)
     print(paths)
     print(str(g))
+    create_graph_file(g, 'graph.gfa')
+    create_abundance_file(g, 'abundance.txt')
+
+
+def create_abundance_file(graph: Graph, filename:str):
+        with open(f'output/vg-flow/data/{filename}', 'w') as f:
+            for v in graph.vertices():
+                f.write(f"{int(v)}:{graph.vp.weight[v]}\n")
+
+
+def create_graph_file(graph: Graph, filename: str):
+    write_gfa(graph, f'output/vg-flow/data/{filename}', paths=[])
 
 
 def create_haplotypes(genome: str, mutationrate: float, num_haps: int) -> np.array:
@@ -68,7 +80,7 @@ def make_graph(haplotypes: np.ndarray, weights: np.ndarray) -> Graph:
             if i != 0: # create edges
                 if not g.edge(last_vertices[j], vertex):
                     e = g.add_edge(last_vertices[j], vertex)
-                    g.ep.ori[e] = '+'  # Orientation of edge
+                    g.ep.ori[e] = '++'  # Orientation of edge
             if i % 8 == 0:
                 contig = haplotypes[j][i::]
                 if len(contig) > 13:
@@ -121,7 +133,8 @@ def contract_vertices(g: Graph) -> Graph:
             g.vp.contigs[t] = list(set(g.vp.contigs[s]) | set(g.vp.contigs[t]))
             for e in s.in_edges():
                 new_start_vertex = e.source()
-                g.add_edge(new_start_vertex, t)
+                e =  g.add_edge(new_start_vertex, t)
+                g.ep.ori[e] = '++'  # Orientation of edge
             vertices_to_remove.append(s)
     g.remove_vertex(reversed(sorted(vertices_to_remove)), fast=False)
     g = g.copy()  # Create a copy to reindex vertices
@@ -134,6 +147,47 @@ def contract_vertices(g: Graph) -> Graph:
     # g.vertex_index = g.vp.new_index  # Overwrite the default index mapping
 
     return g
+
+def write_gfa(g, gfa_file, paths=None):
+    """
+    Write graph-tool graph to a gfa format storing nodes, edges, and paths.
+    Returns nothing.
+    """
+    contigs = {} # dict mapping contigs to lists of nodes
+    with open(gfa_file, 'w') as f:
+        f.write("H\tVN:Z:1.0") # header line GFA 1.0
+        for v in g.vertices():
+            f.write("\nS\t{}\t{}".format(int(v), g.vp.seq[v]))
+            for w in v.out_neighbors():
+                e = g.edge(v, w)
+                ori = g.ep.ori[e]
+                assert len(ori) == 2
+                f.write("\nL\t{}\t{}\t{}\t{}\t0M".format(int(v), ori[0],
+                                                         int(w), ori[1]))
+            for k in g.vp.contigs[v]:
+                if k in contigs.keys():
+                    contigs[k].append(v)
+                else:
+                    contigs[k] = [v]
+
+        if paths != None:
+            if len(paths) > 0:
+                # write paths from path list
+                path_info = paths
+            else:
+                # write paths based on graph traversal
+                path_info = contigs
+            for k, node_list in path_info.items():
+                if len(node_list) == 0:
+                    print("Skipping length 0 path")
+                    continue
+                path = ""
+                # for v in contigs[k]:
+                for v in node_list:
+                    path += str(int(v)) + '+,'
+                path = path.rstrip(',')
+                f.write("\nP\t{}\t{}".format(k, path))
+    return
 
 
 if __name__ == '__main__':
