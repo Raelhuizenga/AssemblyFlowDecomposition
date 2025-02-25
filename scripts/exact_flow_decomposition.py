@@ -25,7 +25,7 @@ def main():
     args = parser.parse_args()
     # test_with_simulated_data(genome_size=args.genome_size, num_haps = args.num_haps, mutataion_rate=args.mutation_rate)
     # test_with_read_from_file('Data/example_graphs/graph_1_three_paths.gfa', 'Data/example_graphs/abundances_1.txt')
-    for i in range(10, 1500, 100):
+    for i in range(100, 1500, 100):
         test_with_simulated_data(i, num_haps = args.num_haps, mutataion_rate=args.mutation_rate)
 
 
