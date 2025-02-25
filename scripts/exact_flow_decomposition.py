@@ -23,10 +23,10 @@ def main():
     parser.add_argument('-m', '--mutation_rate', dest='mutation_rate', type=float, required=True, help="Mutation rate")
     parser.add_argument('-i', '--num_haps', dest='num_haps', type=int, required=True, help="Number of haplotypes, creates test instances from 2 to i")
     args = parser.parse_args()
-    test_with_simulated_data(genome_size=args.genome_size, num_haps = args.num_haps, mutataion_rate=args.mutation_rate)
+    # test_with_simulated_data(genome_size=args.genome_size, num_haps = args.num_haps, mutataion_rate=args.mutation_rate)
     # test_with_read_from_file('Data/example_graphs/graph_1_three_paths.gfa', 'Data/example_graphs/abundances_1.txt')
-    # for i in range(10, 2000, 50):
-    #     test_with_simulated_data(i, 3)
+    for i in range(10, 1500, 100):
+        test_with_simulated_data(i, num_haps = args.num_haps, mutataion_rate=args.mutation_rate)
 
 
 
@@ -116,12 +116,12 @@ def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2)
     print("Execution Time: {:.2f} seconds".format(end_time - start_time))
 
     # save solution paths and weights to file
-    with open(f"output/solutions/numhaplotypes/solution_paths_{genome_size}_{num_haps}.json", "w") as f:
-        json.dump({"weights": w_sol, "paths": sol_paths, "time": end_time-start_time}, f)
+    with open(f"output/solutions/numnodes/solution_paths_{genome_size}_{num_haps}.json", "w") as f:
+        json.dump({"weights": w_sol, "paths": sol_paths, "time": end_time-start_time, "num_vertices": len(list(graph.vertices()))}, f)
 
-    with open(f"output/solutions/ILP/solution_paths_{genome_size}_{num_haps}.final.fasta", "w") as f:
-        for i in range(len(w_sol)):
-            f.write(f'>path{i} {w_sol[i]}x freq={round(w_sol[i] / sum(w_sol), 3)}\n{sol_paths[i]}\n')
+    # with open(f"output/solutions/ILP/solution_paths_{genome_size}_{num_haps}.final.fasta", "w") as f:
+    #     for i in range(len(w_sol)):
+    #         f.write(f'>path{i} {w_sol[i]}x freq={round(w_sol[i] / sum(w_sol), 3)}\n{sol_paths[i]}\n')
 
     assert(sorted(sol_paths) == sorted(haps))
     
