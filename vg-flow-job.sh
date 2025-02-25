@@ -25,7 +25,7 @@ srun apptainer exec \
   -B "$WORKDIR:$WORKDIR" \
   -B "$HOME:$HOME" \
   "$APPTAINER_ROOT/$APPTAINER_NAME" \
-  python "$SCRIPT_DIR/vg-flow.py" -m 1 -c 1 -d 0 "output/vg-flow/data/abundance_10001_4.txt" "output/vg-flow/data/graph_10001_4.gfa" --max_strains 10 --trim 0
+  python "$SCRIPT_DIR/vg-flow.py" -m 1 -c 1 -d 0 "output/vg-flow/data/abundance_10002_4.txt" "output/vg-flow/data/graph_10002_4.gfa" --max_strains 10 --trim 0
 
 if [ $? -eq 0 ]; then
   echo "Script finished successfully."
