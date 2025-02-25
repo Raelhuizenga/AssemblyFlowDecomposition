@@ -81,10 +81,10 @@ def make_graph(haplotypes: np.ndarray, weights: np.ndarray) -> Graph:
                 if not g.edge(last_vertices[j], vertex):
                     e = g.add_edge(last_vertices[j], vertex)
                     g.ep.ori[e] = '++'  # Orientation of edge
-            if i % 8 == 0:
+            if i % 20 == 0:
                 contig = haplotypes[j][i::]
-                if len(contig) > 13:
-                    contig = contig[:12]
+                if len(contig) > 25:
+                    contig = contig[:24]
                 if vertex in contig_dict:
                     contig_dict[vertex].append(contig)
                 else:
