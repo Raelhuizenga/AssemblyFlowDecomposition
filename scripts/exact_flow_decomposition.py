@@ -33,7 +33,7 @@ def main():
     threads = 8
     if threads == 0:
         threads = os.cpu_count()
-    for i in range(2, 6):
+    for i in range(2, 7):
         test_with_simulated_data(1000, i, 0.1, threads)
 
 
