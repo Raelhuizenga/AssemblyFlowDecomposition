@@ -4,7 +4,7 @@
 #SBATCH --time=2:00:00        # Request run time (wall-clock)
 #SBATCH --ntasks=1            # Request number of parallel tasks per job
 #SBATCH --cpus-per-task=8     # Request number of CPUs (threads) per task
-#SBATCH --mem=1GB             # Request memory (MB) per node
+#SBATCH --mem=2GB             # Request memory (MB) per node
 #SBATCH --mail-type=END       # Notify when the job ends
 #SBATCH --output=slurm_%j.out # Set name of output log
 #SBATCH --error=slurm_%j.err  # Set name of error log
