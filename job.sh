@@ -3,7 +3,7 @@
 #SBATCH --qos=short           # Request Quality of Service
 #SBATCH --time=2:00:00        # Request run time (wall-clock)
 #SBATCH --ntasks=1            # Request number of parallel tasks per job
-#SBATCH --cpus-per-task=2     # Request number of CPUs (threads) per task
+#SBATCH --cpus-per-task=8     # Request number of CPUs (threads) per task
 #SBATCH --mem=1GB             # Request memory (MB) per node
 #SBATCH --mail-type=END       # Notify when the job ends
 #SBATCH --output=slurm_%j.out # Set name of output log
@@ -25,7 +25,7 @@ srun apptainer exec \
   -B "$WORKDIR:$WORKDIR" \
   -B "$HOME:$HOME" \
   "$APPTAINER_ROOT/$APPTAINER_NAME" \
-  python "$SCRIPT_DIR/exact_flow_decomposition.py" -g 10000 -m 0.05 -i 3 
+  python "$SCRIPT_DIR/exact_flow_decomposition.py" 
 
 if [ $? -eq 0 ]; then
   echo "Script finished successfully."

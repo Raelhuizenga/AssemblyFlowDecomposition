@@ -3,7 +3,7 @@
 #SBATCH --qos=short           # Request Quality of Service
 #SBATCH --time=2:00:00        # Request run time (wall-clock)
 #SBATCH --ntasks=1            # Request number of parallel tasks per job
-#SBATCH --cpus-per-task=2     # Request number of CPUs (threads) per task
+#SBATCH --cpus-per-task=8     # Request number of CPUs (threads) per task
 #SBATCH --mem=1GB             # Request memory (MB) per node
 #SBATCH --mail-type=END       # Notify when the job ends
 #SBATCH --output=slurm_%j.out # Set name of output log
@@ -25,7 +25,7 @@ srun apptainer exec \
   -B "$WORKDIR:$WORKDIR" \
   -B "$HOME:$HOME" \
   "$APPTAINER_ROOT/$APPTAINER_NAME" \
-  python "$SCRIPT_DIR/vg-flow.py" -m 1 -c 1 -d 0 "output/vg-flow/data/abundance_10002_4.txt" "output/vg-flow/data/graph_10002_4.gfa" --max_strains 10 --trim 0
+  python "$SCRIPT_DIR/vg-flow.py" -m 1 -c 1 -d 0 -t 8 "output/vg-flow/data/abundance_10002_4.txt" "output/vg-flow/data/graph_10002_4.gfa" --max_strains 4 --trim 0
 
 if [ $? -eq 0 ]; then
   echo "Script finished successfully."

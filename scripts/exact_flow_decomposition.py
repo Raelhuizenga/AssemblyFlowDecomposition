@@ -18,17 +18,23 @@ usage = """
 """
 
 def main():
-    parser = argparse.ArgumentParser(description=usage)
-    parser.add_argument('-g', '--genome_size', dest='genome_size', type=int, required=True, help="Size of the genome")
-    parser.add_argument('-m', '--mutation_rate', dest='mutation_rate', type=float, required=True, help="Mutation rate")
-    parser.add_argument('-i', '--num_haps', dest='num_haps', type=int, required=True, help="Number of haplotypes, creates test instances from 2 to i")
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser(description=usage)
+    # parser.add_argument('-g', '--genome_size', dest='genome_size', type=int, required=True, help="Size of the genome")
+    # parser.add_argument('-m', '--mutation_rate', dest='mutation_rate', type=float, required=True, help="Mutation rate")
+    # parser.add_argument('-i', '--num_haps', dest='num_haps', type=int, required=True, help="Number of haplotypes, creates test instances from 2 to i")
+    # args = parser.parse_args()
     # test_with_simulated_data(genome_size=args.genome_size, num_haps = args.num_haps, mutataion_rate=args.mutation_rate)
     # test_with_read_from_file('Data/example_graphs/graph_1_three_paths.gfa', 'Data/example_graphs/abundances_1.txt')
-    for i in range(100, 1500, 100):
-        test_with_simulated_data(i, num_haps = args.num_haps, mutataion_rate=args.mutation_rate)
-
-
+    # for i in range(100, 1500, 100):
+    #     test_with_simulated_data(i, num_haps = args.num_haps, mutataion_rate=args.mutation_rate)
+    # seq = create_genome(10001)
+    # haps = create_haplotypes(seq, 0.01, 4)
+    # save_haps_to_file(haps, 10001, 4)
+    threads = 8
+    if threads == 0:
+        threads = os.cpu_count()
+    for i in range(2, 6):
+        test_with_simulated_data(1000, i, 0.1, threads)
 
 
 def test_with_read_from_file(gfa_file: str, abundance_file: str):
@@ -79,18 +85,18 @@ def test_with_read_from_file(gfa_file: str, abundance_file: str):
     for path in sol_paths:
         print(get_sequence_from_path(graph, path))
 
+def save_haps_to_file(haps, genome_size, num_haps):
+    # save haps to file
+    weights = exponential_weights(num_haps)
+    with open(f"output/solutions/haps_{genome_size}_{num_haps}.fasta", "w") as f:
+        for i in range(len(haps)):
+            f.write(f'>path{i} {weights[i]}x freq={round(weights[i] / sum(weights), 3)}\n{haps[i]}\n')
 
-def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2):
+def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2, threads=0):
     #start time
     start_time = time.time()
-
     seq = create_genome(genome_size)
     haps = create_haplotypes(seq, mutataion_rate, num_haps)
-
-    # save haps to file
-    with open(f"output/haplotypes_{genome_size}_{num_haps}.json", "w") as f:
-        json.dump({"Haplotypes" : haps.tolist()}, f)
-    
     weights = exponential_weights(num_haps)
     graph, contigs = make_graph(haps, weights)
     graph = contract_vertices(graph)
@@ -109,19 +115,19 @@ def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2)
     print("#vertices = {}".format(len(list(graph.vertices()))))
     print("#edges = {}".format(len(list(graph.edges()))))
     print("*******************************\n")
-    w_sol, sol_paths, z_sol = mfd_algorithm(graph, paths_edges, max_strains=30, threads=8)
+    w_sol, sol_paths, z_sol = mfd_algorithm(graph, paths_edges, max_strains=30, threads=threads)
     sol_paths = [get_sequence_from_path(graph, path) for path in sol_paths]
 
     end_time = time.time()
     print("Execution Time: {:.2f} seconds".format(end_time - start_time))
 
     # save solution paths and weights to file
-    with open(f"output/solutions/numnodes/solution_paths_{genome_size}_{num_haps}.json", "w") as f:
+    with open(f"output/solutions/breakingsymmetry/solution_paths_{genome_size}_{num_haps}.json", "w") as f:
         json.dump({"weights": w_sol, "paths": sol_paths, "time": end_time-start_time, "num_vertices": len(list(graph.vertices()))}, f)
 
-    # with open(f"output/solutions/ILP/solution_paths_{genome_size}_{num_haps}.final.fasta", "w") as f:
-    #     for i in range(len(w_sol)):
-    #         f.write(f'>path{i} {w_sol[i]}x freq={round(w_sol[i] / sum(w_sol), 3)}\n{sol_paths[i]}\n')
+    with open(f"output/solutions/breakingsymmetry/solution_paths_{genome_size}_{num_haps}.final.fasta", "w") as f:
+        for i in range(len(w_sol)):
+            f.write(f'>path{i} {w_sol[i]}x freq={round(w_sol[i] / sum(w_sol), 3)}\n{sol_paths[i]}\n')
 
     assert(sorted(sol_paths) == sorted(haps))
     
@@ -306,7 +312,7 @@ def draw_graph(g):
     )
 
 
-def mfd_algorithm(graph: Graph, subpaths, max_strains=10, threads=1) -> tuple:
+def mfd_algorithm(graph: Graph, subpaths, max_strains=10, threads=0) -> tuple:
     for i in range(2, max_strains): 
         w_sol, paths, z_sol = fd_fixed_size(graph, subpaths, i, threads=threads)
         if w_sol != []:
@@ -376,11 +382,13 @@ def build_base_ilp_model(graph, subpaths, size, use_only_subpaths=False):
             model.addConstr(z[u, v, k] <= max_flow_value * x[u, v, k], name=f"Linearization 1 {u} {v} {k}")
             model.addConstr(w[k] - (1 - x[u, v, k]) * max_flow_value <= z[u, v, k], name=f"Linearization 2 {u} {v} {k}")
             model.addConstr(z[u, v, k] <= w[k], name=f"Linearization 3 {u} {v} {k}, flow balance")
-
+    # # Add symmetry breaking constraints        
+    model.addConstrs(w[k] <= w[k+1] for k in range(size-1))
+    model.setObjective(gp.quicksum(w[k] for k in SC), GRB.MINIMIZE)
     return model, x, w, z
 
 
-def fd_fixed_size(graph, subpaths, size, threads = 1) -> tuple:
+def fd_fixed_size(graph, subpaths, size, threads = 0) -> tuple:
     w_sol = []
     paths = []
     z_sol = {}
