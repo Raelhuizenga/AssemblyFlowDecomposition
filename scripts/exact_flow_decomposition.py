@@ -122,10 +122,10 @@ def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2,
     print("Execution Time: {:.2f} seconds".format(end_time - start_time))
 
     # save solution paths and weights to file
-    with open(f"output/solutions/nosymmetry/solution_paths_{genome_size}_{num_haps}.json", "w") as f:
+    with open(f"output/solutions/breakingsymmetry/solution_paths_{genome_size}_{num_haps}.json", "w") as f:
         json.dump({"weights": w_sol, "paths": sol_paths, "time": end_time-start_time, "num_vertices": len(list(graph.vertices()))}, f)
 
-    with open(f"output/solutions/nosymmetry/solution_paths_{genome_size}_{num_haps}.final.fasta", "w") as f:
+    with open(f"output/solutions/breakingsymmetry/solution_paths_{genome_size}_{num_haps}.final.fasta", "w") as f:
         for i in range(len(w_sol)):
             f.write(f'>path{i} {w_sol[i]}x freq={round(w_sol[i] / sum(w_sol), 3)}\n{sol_paths[i]}\n')
 
@@ -383,8 +383,8 @@ def build_base_ilp_model(graph, subpaths, size, use_only_subpaths=False):
             model.addConstr(w[k] - (1 - x[u, v, k]) * max_flow_value <= z[u, v, k], name=f"Linearization 2 {u} {v} {k}")
             model.addConstr(z[u, v, k] <= w[k], name=f"Linearization 3 {u} {v} {k}, flow balance")
     # # Add symmetry breaking constraints        
-    # model.addConstrs(w[k] <= w[k+1] for k in range(size-1))
-    # model.setObjective(gp.quicksum(w[k] for k in SC), GRB.MINIMIZE)
+    model.addConstrs(w[k] <= w[k+1] for k in range(size-1))
+    model.setObjective(gp.quicksum(w[k] for k in SC), GRB.MINIMIZE)
     return model, x, w, z
 
 
