@@ -2,40 +2,49 @@ import sys
 import random
 from graph_tool.all import Graph
 import numpy as np
+import argparse
 
 def main():
-    seq = create_genome(4)
-    print(seq)
-    haps = create_haplotypes(seq, 0.2, 3, 43)
-    print(haps)
-    weights = [1, 2, 4]
-    g, contigs = make_graph(haps, weights)
-    print(contigs)
+    parser = argparse.ArgumentParser(description="Simulate a genome variation graph")
+    parser.add_argument('-g', '--genome_size', dest='genome_size', type=int, required=True, help="Size of the genome")
+    parser.add_argument('-m', '--mutation_rate', dest='mutation_rate', type=float, required=True, help="Mutation rate")
+    parser.add_argument('-k', '--num_haps', dest='num_haps', type=int, required=True, help="Number of haplotypes, creates test instances from 2 to i")
+    parser.add_argument('-f', '--file_location', dest='file_location', type=str, required=True, help="Location of the folder where the data should be stored in")
+    parser.add_argument('-c', '--contig_length', dest='contig_length', type=int, default=100, help="Number of bases of a contig")
+    args = parser.parse_args()
+
+    seq = create_genome(args.genome_size)
+    haps = create_haplotypes(seq, args.mutation_rate, args.num_haps)
+    # weights = exponential_weights(args.num_haps)
+    weights = random_exponential_weights(args.num_haps)
+    g, contigs = make_graph(haps, weights, args.contig_length)
     g = contract_vertices(g)
-    paths = get_contig_paths_from_graph(g, contigs)
-    print(paths)
-    print(str(g))
-    create_graph_file(g, 'graph.gfa')
-    create_abundance_file(g, 'abundance.txt')
+    save_haps_to_file(haps, weights, f'{args.file_location}/true_haps_{args.genome_size}_{args.num_haps}.fasta')
+    write_gfa(g, f'{args.file_location}/graph_{args.genome_size}_{args.num_haps}.gfa')
+    create_abundance_file(g, f'{args.file_location}/_abundance_{args.genome_size}_{args.num_haps}.txt')
+
+
+def exponential_weights(size_array) -> list:
+    # create exponential weights
+    return [2**i for i in range(size_array)]
+
+
+def random_exponential_weights(size_array) -> list:
+    # create random weights
+    return np.random.exponential(2**size_array, size_array).astype(int).tolist()
 
 
 def create_abundance_file(graph: Graph, filename:str):
-        with open(f'output/vg-flow/data/{filename}', 'w') as f:
+        with open(filename, 'w') as f:
             for v in graph.vertices():
                 f.write(f"{int(v)}:{graph.vp.weight[v]}\n")
 
 
-def create_graph_file(graph: Graph, filename: str):
-    write_gfa(graph, f'output/vg-flow/data/{filename}', paths=[])
-
-
-def create_haplotypes(genome: str, mutationrate: float, num_haps: int, seed=None) -> np.array:
-    haplotypes = [genome]
+def create_haplotypes(genome: str, mutationrate: float, num_haps: int) -> np.array:
+    haplotypes = []
     bases = "ACTG"
-    if seed is not None:
-        random.seed(seed)
 
-    for i in range(num_haps - 1):
+    for i in range(num_haps):
         haplotype = list(genome)
         for j in range(len(haplotype)):
             if random.random() < mutationrate:  # Mutate with probability mutationrate
@@ -44,17 +53,15 @@ def create_haplotypes(genome: str, mutationrate: float, num_haps: int, seed=None
     return np.array(haplotypes)
 
 
-def create_genome(length: int, seed=None) -> str:
-    if seed != None:
-        random.seed(seed)
+def create_genome(length: int) -> str:
     return ''.join(random.choices("ACTG", k=length))
 
 
-def make_graph(haplotypes: np.ndarray, weights: np.ndarray) -> Graph:
+def make_graph(haplotypes: np.ndarray, weights: np.ndarray, contig_length: int) -> tuple[Graph, list]:
     """
     Returns graph in graph-tool format.
     """
-    g = Graph(directed=True) #Define a graph with its properties
+    g = Graph(directed=True) 
     g.vp.seq = g.new_vertex_property('string')
     g.vp.contigs = g.new_vertex_property('vector<string>')
     g.vp.weight = g.new_vertex_property('int', val=0)
@@ -83,10 +90,10 @@ def make_graph(haplotypes: np.ndarray, weights: np.ndarray) -> Graph:
                 if not g.edge(last_vertices[j], vertex):
                     e = g.add_edge(last_vertices[j], vertex)
                     g.ep.ori[e] = '++'  # Orientation of edge
-            if i % 500 == 0:
+            if i % contig_length == 0:
                 contig = haplotypes[j][i::]
-                if len(contig) > 520:
-                    contig = contig[:519]
+                if len(contig) > contig_length + 20:
+                    contig = contig[:contig_length + 19]
                 if vertex in contig_dict:
                     contig_dict[vertex].append(contig)
                 else:
@@ -112,21 +119,11 @@ def make_graph(haplotypes: np.ndarray, weights: np.ndarray) -> Graph:
             contig_number += 1
     return g, contig_numbers_list
 
-def get_contig_paths_from_graph(g: Graph, contig_list: list) -> list:
-    contigs = []
-    for contig in contig_list:
-        last_vertex = None
-        contig_path = []
-        for v in g.vertices():
-            if contig in g.vp.contigs[v]:
-                if last_vertex:
-                    contig_path.append((int(last_vertex), int(v)))
-                last_vertex = v
-        contigs.append(contig_path)
-    return contigs
-
 
 def contract_vertices(g: Graph) -> Graph:
+    """
+    Contract vertices that form a simple path.
+    """
     edges_to_contract = list(g.edges())
     vertices_to_remove = []
     for s,t in edges_to_contract:
@@ -140,15 +137,8 @@ def contract_vertices(g: Graph) -> Graph:
             vertices_to_remove.append(s)
     g.remove_vertex(reversed(sorted(vertices_to_remove)), fast=False)
     g = g.copy()  # Create a copy to reindex vertices
-
-    # Reindex vertices
-    # g.vp.new_index = g.new_vertex_property("int")  # Temporary property to store new indices
-    # for new_idx, v in enumerate(g.vertices()):
-    #     g.vp.new_index[v] = new_idx
-
-    # g.vertex_index = g.vp.new_index  # Overwrite the default index mapping
-
     return g
+
 
 def write_gfa(g, gfa_file, paths=None):
     """
@@ -190,6 +180,12 @@ def write_gfa(g, gfa_file, paths=None):
                 path = path.rstrip(',')
                 f.write("\nP\t{}\t{}".format(k, path))
     return
+
+def save_haps_to_file(haps, weights, filename):
+    # save haps to file
+    with open(filename, "w") as f:
+        for i in range(len(haps)):
+            f.write(f'>path{i} {weights[i]}x freq={round(weights[i] / sum(weights), 3)}\n{haps[i]}\n')
 
 
 if __name__ == '__main__':
