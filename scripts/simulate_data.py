@@ -6,7 +6,7 @@ import numpy as np
 def main():
     seq = create_genome(4)
     print(seq)
-    haps = create_haplotypes(seq, 0.2, 3)
+    haps = create_haplotypes(seq, 0.2, 3, 43)
     print(haps)
     weights = [1, 2, 4]
     g, contigs = make_graph(haps, weights)
@@ -29,10 +29,11 @@ def create_graph_file(graph: Graph, filename: str):
     write_gfa(graph, f'output/vg-flow/data/{filename}', paths=[])
 
 
-def create_haplotypes(genome: str, mutationrate: float, num_haps: int) -> np.array:
+def create_haplotypes(genome: str, mutationrate: float, num_haps: int, seed=None) -> np.array:
     haplotypes = [genome]
     bases = "ACTG"
-    random.seed(43)
+    if seed is not None:
+        random.seed(seed)
 
     for i in range(num_haps - 1):
         haplotype = list(genome)
@@ -43,8 +44,9 @@ def create_haplotypes(genome: str, mutationrate: float, num_haps: int) -> np.arr
     return np.array(haplotypes)
 
 
-def create_genome(length: int) -> str:
-    random.seed(43)
+def create_genome(length: int, seed=None) -> str:
+    if seed != None:
+        random.seed(seed)
     return ''.join(random.choices("ACTG", k=length))
 
 
@@ -81,10 +83,10 @@ def make_graph(haplotypes: np.ndarray, weights: np.ndarray) -> Graph:
                 if not g.edge(last_vertices[j], vertex):
                     e = g.add_edge(last_vertices[j], vertex)
                     g.ep.ori[e] = '++'  # Orientation of edge
-            if i % 100 == 0:
+            if i % 500 == 0:
                 contig = haplotypes[j][i::]
-                if len(contig) > 110:
-                    contig = contig[:109]
+                if len(contig) > 520:
+                    contig = contig[:519]
                 if vertex in contig_dict:
                     contig_dict[vertex].append(contig)
                 else:

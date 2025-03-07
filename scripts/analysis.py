@@ -4,15 +4,22 @@ import json
 import matplotlib.pyplot as plt
 
 def main():
-    # t, g_length = read_results_from_file_length("output/solutions/genomelength/*.json")
+    # t, num_nodes = read_results_from_file_nodes("output/solutions/numnodes/*.json")
+    # plot_genomelength_vs_num_nodes(t, num_nodes)
+
+    # t, g_length = read_results_from_file_length("output/solutions/numnodes/*.json")
     # plot_genomelength_vs_time(t, g_length)
 
-    t, theoretical, haps = read_results_from_file()
+    # t, theoretical, haps = read_results_from_file("output/solutions/breakingsymmetry/*.json")
+    # t2, theoretical2, haps2 = read_results_from_file("output/solutions/nosymmetry/*.json")
+    # plot_haps_vs_time_symmetry(t2, t, theoretical, haps)
+
+    t, theoretical, haps = read_results_from_file("output/solutions/breakingsymmetry/*.json")
     plot_haps_vs_time(t, theoretical, haps)
 
 
-def read_results_from_file():
-    solution_files = glob.glob("output/solutions/numhaplotypes/*.json")  # Change path if needed
+def read_results_from_file(filename):
+    solution_files = glob.glob(filename)  # Change path if needed
 
     times = []
     theoretical_haps = []
@@ -48,6 +55,20 @@ def read_results_from_file_length(file_path):
             genome_length += 50
     return times, genome_lengths
 
+def read_results_from_file_nodes(file_path):
+    solution_files = glob.glob(file_path)  # Change path if needed
+
+    times = []
+    genome_number_nodes = []
+
+    # Read each file and extract the time
+    for file in solution_files:
+        with open(file, "r") as f:
+            data = json.load(f)
+            times.append(data["time"])
+            genome_number_nodes.append(data["num_vertices"])
+    return times, genome_number_nodes
+
 def plot_genomelength_vs_time(times, genome_lengths):
 
     plt.plot(genome_lengths, times)
@@ -58,20 +79,38 @@ def plot_genomelength_vs_time(times, genome_lengths):
     plt.savefig('output/plot_genome_length.png')
 
 
-def plot_haps_vs_time(times, theoretical_haps, num_haps):
-    plt.plot(theoretical_haps, times)
-    plt.xlabel("Number of haplotypes")
+def plot_genomelength_vs_num_nodes(times, num_nodes):
+
+    plt.scatter(num_nodes, times)
+    plt.xlabel("Number of nodes")
     plt.ylabel("Time (s)")
-    plt.title("Time vs theortical number of haplotypes")
+    plt.title("Time vs number of nodes")
     plt.show()
-    plt.savefig('output/plot_theorethical_haps.png')
+    plt.savefig('output/plot_num_nodes.png')
+
+def plot_haps_vs_time(times, theoretical_haps, num_haps):
+    # plt.plot(theoretical_haps, times)
+    # plt.xlabel("Number of haplotypes")
+    # plt.ylabel("Time (s)")
+    # plt.title("Time vs theortical number of haplotypes")
+    # plt.show()
+    # plt.savefig('output/plot_theorethical_haps.png')
 
     plt.scatter(num_haps, times, label="Real")
     plt.xlabel("Number of haplotypes")
     plt.ylabel("Time (s)")
-    plt.title("Time vs found number of haplotypes")
+    plt.title("Time vs found number of haplotypes (break symmetry)")
     plt.show()
     plt.savefig('output/plot_found_haps.png')
+
+def plot_haps_vs_time_symmetry(times_symmetry, times_break_symmetry, theoretical_haps, num_haps):
+    plt.scatter(num_haps, times_symmetry, label="Symmetry")
+    plt.scatter(num_haps, times_break_symmetry, label="No symmetry")
+    plt.xlabel("Number of haplotypes")
+    plt.ylabel("Time (s)")
+    plt.title("Time vs found number of haplotypes")
+    plt.show()
+    plt.savefig('output/plot_haps_effect_symmetry.png')
 
 if __name__ == '__main__':
     sys.exit(main())

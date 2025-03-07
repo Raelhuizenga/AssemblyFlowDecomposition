@@ -30,11 +30,11 @@ def main():
     # seq = create_genome(10001)
     # haps = create_haplotypes(seq, 0.01, 4)
     # save_haps_to_file(haps, 10001, 4)
-    threads = 8
+    threads = 0
     if threads == 0:
         threads = os.cpu_count()
 
-    test_with_simulated_data(1000, 7, 0.1, threads)
+    test_with_simulated_data(10000, 2, 0.001, threads)
 
 
 def test_with_read_from_file(gfa_file: str, abundance_file: str):
@@ -47,6 +47,7 @@ def test_with_read_from_file(gfa_file: str, abundance_file: str):
 
     # reformate paths
     paths_edges = create_contig_paths(paths)
+ 
 
     graph.vp.weight = graph.new_vertex_property('int', 0)
     for i, v in enumerate(list(graph.vertices())[:-2]):
@@ -94,7 +95,6 @@ def save_haps_to_file(haps, genome_size, num_haps):
 
 def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2, threads=0):
     #start time
-    start_time = time.time()
     seq = create_genome(genome_size)
     haps = create_haplotypes(seq, mutataion_rate, num_haps)
     weights = exponential_weights(num_haps)
@@ -107,7 +107,6 @@ def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2,
     print("Objective value: ", obj)
     assert(is_DAG(graph))
     paths_edges = get_contig_paths_from_graph(graph, contigs)
-
     # Save graph in GFA format
     # write_gfa(graph, "simulated_graph.gfa")
     # draw_graph(graph)
@@ -115,6 +114,7 @@ def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2,
     print("#vertices = {}".format(len(list(graph.vertices()))))
     print("#edges = {}".format(len(list(graph.edges()))))
     print("*******************************\n")
+    start_time = time.time()
     w_sol, sol_paths, z_sol = mfd_algorithm(graph, paths_edges, max_strains=30, threads=threads)
     sol_paths = [get_sequence_from_path(graph, path) for path in sol_paths]
 
@@ -122,10 +122,10 @@ def test_with_simulated_data(genome_size=1000, num_haps = 8, mutataion_rate=0.2,
     print("Execution Time: {:.2f} seconds".format(end_time - start_time))
 
     # save solution paths and weights to file
-    with open(f"output/solutions/breakingsymmetry/solution_paths_{genome_size}_{num_haps}.json", "w") as f:
+    with open(f"output/solutions/ILP/solution_paths_{genome_size}_{num_haps}.json", "w") as f:
         json.dump({"weights": w_sol, "paths": sol_paths, "time": end_time-start_time, "num_vertices": len(list(graph.vertices()))}, f)
 
-    with open(f"output/solutions/breakingsymmetry/solution_paths_{genome_size}_{num_haps}.final.fasta", "w") as f:
+    with open(f"output/solutions/ILP/solution_paths_{genome_size}_{num_haps}.final.fasta", "w") as f:
         for i in range(len(w_sol)):
             f.write(f'>path{i} {w_sol[i]}x freq={round(w_sol[i] / sum(w_sol), 3)}\n{sol_paths[i]}\n')
 

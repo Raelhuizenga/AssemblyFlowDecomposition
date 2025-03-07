@@ -192,8 +192,6 @@ def main():
             abundance_list, vg_to_contigs, adj_out, skip_nodes,
             args.reduce_obj, minimization_min_cov, args.min_cov,
             args.min_ab, args.threads)
-    print("##################### HERE #####################")
-    print(x)
     # write contigs and their subpaths to files for error investigation
     contig_dict = {}
     for i, c in enumerate(adj_out):
@@ -1253,6 +1251,7 @@ def get_adj_out(paths, g, low_ab_nodes, del_set):
     Returns an adjacency list & info of all feasible contig concatenations.
     """
     adj_out = {c : [] for c in paths.keys() if c not in del_set}
+    print(f"adj_out: {len(adj_out)}")
     adj_in = {c : [] for c in paths.keys() if c not in del_set}
     start_info = {c : {} for c in adj_out.keys()}
     minimap2_overlaps = "overlaps.minimap2.paf"
@@ -1787,7 +1786,6 @@ def optimize_abundances(a, nvert, paths, skip_nodes, reduce_obj, max_strains,
             if obj_func < 4 or obj_func == 6:
                 m.addConstr(y[v] == 0, "y_{}_0".format(v))
             continue
-        print('hellooo')
         if reduce_obj > 0:
             # check if v adds a new combination of paths
             path_combi = tuple(P[v])
