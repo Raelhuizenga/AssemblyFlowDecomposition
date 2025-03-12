@@ -30,6 +30,7 @@ def main():
 
     
 def process_graph(graph_file: str, abundance_file: str):
+    print("Processing graph:", graph_file)
 
     graph, subpath_constraints_nodes = convert_gfa_to_networkx(graph_file, abundance_file)
 
@@ -82,7 +83,7 @@ def process_solution(graph: nx.DiGraph, neGraph: fp.NodeExpandedDiGraph, model: 
 
         # Printing the paths and weights
         print("Paths:", paths)
-        print("Weights:", solution["weights"])
+        # print("Weights:", solution["weights"])
         
         # Double checking that the model returned a valid flow decomposition
         print("model.is_valid_solution()", model.is_valid_solution())
