@@ -82,8 +82,8 @@ def process_solution(graph: nx.DiGraph, neGraph: fp.NodeExpandedDiGraph, model: 
         paths = neGraph.get_condensed_paths(expanded_paths)
 
         # Printing the paths and weights
-        print("Paths:", paths)
-        # print("Weights:", solution["weights"])
+        # print("Paths:", paths)
+        print("Weights:", solution["weights"])
         
         # Double checking that the model returned a valid flow decomposition
         print("model.is_valid_solution()", model.is_valid_solution())
