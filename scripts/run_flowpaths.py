@@ -12,15 +12,15 @@ def main():
     # network = add_source_and_sink_node(network)
     graphs_files = [
         # ("output/vg-flow/data/graph_100_3.gfa", "output/vg-flow/data/abundance_100_3.txt"),
-        ("simulated_data/gridsearch/graph_1000_6.gfa", "simulated_data/gridsearch/abundance_1000_6.txt"),
-        ("simulated_data/gridsearch/graph_1000_7.gfa", "simulated_data/gridsearch/abundance_1000_7.txt"),
-        ("simulated_data/gridsearch/graph_1000_8.gfa", "simulated_data/gridsearch/abundance_1000_8.txt"),
-        ("simulated_data/gridsearch/graph_10000_6.gfa", "simulated_data/gridsearch/abundance_10000_6.txt"),
-        ("simulated_data/gridsearch/graph_10000_7.gfa", "simulated_data/gridsearch/abundance_10000_7.txt"),
-        ("simulated_data/gridsearch/graph_10000_8.gfa", "simulated_data/gridsearch/abundance_10000_8.txt"),
-        ("simulated_data/gridsearch/graph_100000_6.gfa", "simulated_data/gridsearch/abundance_100000_6.txt"),
-        ("simulated_data/gridsearch/graph_100000_7.gfa", "simulated_data/gridsearch/abundance_100000_7.txt"),
-        ("simulated_data/gridsearch/graph_100000_8.gfa", "simulated_data/gridsearch/abundance_100000_8.txt"),
+        ("simulated_data/gridsearch/graph_1000_6.gfa", "simulated_data/gridsearch/abundances_1000_6.txt"),
+        ("simulated_data/gridsearch/graph_1000_7.gfa", "simulated_data/gridsearch/abundances_1000_7.txt"),
+        ("simulated_data/gridsearch/graph_1000_8.gfa", "simulated_data/gridsearch/abundances_1000_8.txt"),
+        ("simulated_data/gridsearch/graph_10000_6.gfa", "simulated_data/gridsearch/abundances_10000_6.txt"),
+        ("simulated_data/gridsearch/graph_10000_7.gfa", "simulated_data/gridsearch/abundances_10000_7.txt"),
+        ("simulated_data/gridsearch/graph_10000_8.gfa", "simulated_data/gridsearch/abundances_10000_8.txt"),
+        ("simulated_data/gridsearch/graph_100000_6.gfa", "simulated_data/gridsearch/abundances_100000_6.txt"),
+        ("simulated_data/gridsearch/graph_100000_7.gfa", "simulated_data/gridsearch/abundances_100000_7.txt"),
+        ("simulated_data/gridsearch/graph_100000_8.gfa", "simulated_data/gridsearch/abundances_100000_8.txt"),
     ]
 
     # for graph_file in graphs_files:
