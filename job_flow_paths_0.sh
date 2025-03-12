@@ -26,7 +26,7 @@ srun apptainer exec \
   -B "$WORKDIR:$WORKDIR" \
   -B "$HOME:$HOME" \
   "$APPTAINER_ROOT/$APPTAINER_NAME" \
-  python "$SCRIPT_DIR/run_flowpaths.py" -i 0
+  python "$SCRIPT_DIR/run_flowpaths.py" -n 0
 
 # Check if the first script ran successfully
 if [ $? -eq 0 ]; then
